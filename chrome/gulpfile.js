@@ -25,6 +25,11 @@ const plumber = require('gulp-plumber')
 
 const uglify = require('gulp-uglify')
 
+const fs = require('fs')
+const replace = require('gulp-replace');
+const manifest = require('./extension-src/manifest.json');
+const crx = require('gulp-crx-pack');
+
 const paths = {
   scripts: {
     src: 'src/js/**/*.js',
@@ -146,9 +151,54 @@ function watch () {
   gulp.watch(paths.styles.src, styles)
 }
 
+function bumpVersion() {
+  var docString = fs.readFileSync('manifest.json', 'utf8');
+
+  var versionNumPattern=/"(\d\.\d\.\d\.\d)"/;
+  var vNumRexEx = new RegExp(versionNumPattern);
+
+  var oldVersionNumber = (vNumRexEx.exec(docString))[1];
+  var versionParts = oldVersionNumber.split('.');
+  var vArray = {
+    vMajor : versionParts[0],
+    vMinor : versionParts[1],
+    vPatch : versionParts[2],
+    vMod : versionParts[3]
+  };
+
+  vArray.vMod = parseFloat(vArray.vMod) + 1;
+  var periodString = ".";
+
+  var newVersionNumber = vArray.vMajor + periodString +
+      vArray.vMinor+ periodString +
+      vArray.vPatch+ periodString +
+      vArray.vMod;
+
+  return gulp.src(['manifest.json','src/js/lib/ui.js','updates.xml'])
+      .pipe(replace(/'\d\.\d\.\d(\.\d)?'/g, "'"+newVersionNumber+"'"))
+      .pipe(replace(/"\d\.\d\.\d(\.\d)?"/g, '"'+newVersionNumber+'"'))
+      .pipe(gulp.dest(function(file) {
+        return file.base;
+      }))
+      ;
+}
+
+function pack() {
+  return gulp.src('./release')
+      .pipe(crx({
+        privateKey: process.env.PRIVATE_KEY,
+        filename: '../BaiduExporter.crx',
+        codebase: 'https://raw.githubusercontent.com/'+manifest.author+'/BaiduExporter/master/BaiduExporter.crx',
+        updateXmlFilename: 'updates.xml'
+      }))
+      .pipe(gulp.dest(function(file) {
+          return file.base;
+      }));
+}
 const build = gulp.parallel(scripts, styles, images, copys)
 const serve = gulp.series(clean, build, watch)
 const publish = gulp.series(clean, build)
+const packCrx = gulp.series(publish,pack)
 
 exports.build = build
 exports.serve = serve
@@ -156,3 +206,5 @@ exports.publish = publish
 exports.lintJS = lintJS
 exports.lintCSS = lintCSS
 exports.clean = clean
+exports.bumpVersion = bumpVersion
+exports.pack = packCrx
