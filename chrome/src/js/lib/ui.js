@@ -3,18 +3,20 @@ import Store from './store'
 
 class UI {
   constructor () {
-    this.version = '1.0.2'
-    this.updateDate = '2017/12/30'
+    this.version = '1.0.4'
+    this.updateDate = '2019/11/18'
     Store.on('updateView', (configData) => {
       this.updateSetting(configData)
       this.updateMenu(configData)
     })
   }
+
   init () {
     this.addSettingUI()
     this.addTextExport()
     Store.trigger('initConfigData')
   }
+
   // z-index resolve share page show problem
   addMenu (element, position) {
     const menu = `
@@ -44,11 +46,13 @@ class UI {
       settingMenu.classList.add('open-o')
     })
   }
+
   resetMenu () {
     Array.from(document.querySelectorAll('.rpc-button')).forEach((rpc) => {
       rpc.remove()
     })
   }
+
   updateMenu (configData) {
     this.resetMenu()
     const { rpcList } = configData
@@ -59,6 +63,7 @@ class UI {
     })
     document.querySelector('#aria2List').insertAdjacentHTML('afterbegin', rpcDOMList)
   }
+
   addTextExport () {
     const text = `
       <div id="textMenu" class="modal export-menu">
@@ -92,6 +97,7 @@ class UI {
       this.resetTextExport()
     })
   }
+
   resetTextExport () {
     const textMenu = document.querySelector('#textMenu')
     textMenu.querySelector('#aria2Txt').href = ''
@@ -100,6 +106,7 @@ class UI {
     textMenu.querySelector('#aria2CmdTxt').value = ''
     textMenu.querySelector('#copyDownloadLinkTxt').dataset.link = ''
   }
+
   addSettingUI () {
     const setting = `
       <div id="settingMenu" class="modal setting-menu">
@@ -182,6 +189,14 @@ class UI {
             </div><!-- /.setting-menu-row -->
             <div class="setting-menu-row">
               <div class="setting-menu-name">
+                <label class="setting-menu-label">AppId</label>
+              </div>
+              <div class="setting-menu-value">
+                <input class="setting-menu-input app_id-s" spellcheck="false">
+              </div>
+            </div><!-- /.setting-menu-row -->
+            <div class="setting-menu-row">
+              <div class="setting-menu-name">
                 <label class="setting-menu-label">Headers</label>
               </div>
               <div class="setting-menu-value">
@@ -246,14 +261,16 @@ class UI {
       Core.getVersion(Store.getConfigData('rpcList')[0].url, testAria2)
     })
   }
+
   resetSetting () {
     const message = document.querySelector('#message')
     message.innerText = ''
     const testAria2 = document.querySelector('#testAria2')
     testAria2.innerText = '测试连接，成功显示版本号'
   }
+
   updateSetting (configData) {
-    const { rpcList, configSync, md5Check, fold, interval, downloadPath, userAgent, referer, headers } = configData
+    const { rpcList, configSync, md5Check, fold, interval, downloadPath, userAgent, referer, appId, headers } = configData
     // reset dom
     Array.from(document.querySelectorAll('.rpc-s')).forEach((rpc, index) => {
       if (index !== 0) {
@@ -285,6 +302,7 @@ class UI {
     document.querySelector('.downloadPath-s').value = downloadPath
     document.querySelector('.userAgent-s').value = userAgent
     document.querySelector('.referer-s').value = referer
+    document.querySelector('.app_id-s').value = appId
     document.querySelector('.headers-s').value = headers
   }
 
@@ -304,6 +322,7 @@ class UI {
     const downloadPath = document.querySelector('.downloadPath-s').value
     const userAgent = document.querySelector('.userAgent-s').value
     const referer = document.querySelector('.referer-s').value
+    const appId = document.querySelector('.app_id-s').value
     const headers = document.querySelector('.headers-s').value
 
     const configData = {
@@ -315,6 +334,7 @@ class UI {
       downloadPath,
       userAgent,
       referer,
+      appId,
       headers
     }
     Store.trigger('setConfigData', configData)

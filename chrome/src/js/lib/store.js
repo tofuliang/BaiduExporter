@@ -6,6 +6,7 @@ class Store extends EventEmitter {
     this.defaultRPC = [{ name: 'ARIA2 RPC', url: 'http://localhost:6800/jsonrpc' }]
     this.defaultUserAgent = 'netdisk;6.0.0.12;PC;PC-Windows;10.0.16299;WindowsBaiduYunGuanJia'
     this.defaultReferer = 'https://pan.baidu.com/disk/home'
+    this.defaultAppId = 250528
     this.defaultConfigData = {
       rpcList: this.defaultRPC,
       configSync: false,
@@ -15,6 +16,7 @@ class Store extends EventEmitter {
       downloadPath: '',
       userAgent: this.defaultUserAgent,
       referer: this.defaultReferer,
+      appId: this.defaultAppId,
       headers: ''
     }
     this.configData = {}
@@ -22,9 +24,10 @@ class Store extends EventEmitter {
     this.on('setConfigData', this.set.bind(this))
     this.on('clearConfigData', this.clear.bind(this))
   }
+
   init () {
     chrome.storage.sync.get(null, (items) => {
-      for (let key in items) {
+      for (const key in items) {
         chrome.storage.local.set({ key: items[key] }, () => {
           console.log('chrome first local set: %s, %s', key, items[key])
         })
@@ -35,6 +38,7 @@ class Store extends EventEmitter {
       this.trigger('updateView', this.configData)
     })
   }
+
   getConfigData (key = null) {
     if (key) {
       return this.configData[key]
@@ -42,23 +46,26 @@ class Store extends EventEmitter {
       return this.configData
     }
   }
+
   set (configData) {
     this.configData = configData
     this.save(configData)
     this.trigger('updateView', configData)
   }
+
   save (configData) {
-    for (let key in configData) {
+    for (const key in configData) {
       chrome.storage.local.set({ [key]: configData[key] }, () => {
         console.log('chrome local set: %s, %s', key, configData[key])
       })
-      if (configData['configSync'] === true) {
+      if (configData.configSync === true) {
         chrome.storage.sync.set({ [key]: configData[key] }, () => {
           console.log('chrome sync set: %s, %s', key, configData[key])
         })
       }
     }
   }
+
   clear () {
     chrome.storage.sync.clear()
     chrome.storage.local.clear()

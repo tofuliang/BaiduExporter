@@ -15,7 +15,7 @@ class Share extends Downloader {
     }
     const listParameter = {
       search,
-      url: `/share/list?`,
+      url: '/share/list?',
       options: {
         credentials: 'include',
         method: 'GET'
@@ -49,8 +49,9 @@ class Share extends Downloader {
   }
 
   requestCookies () {
-    Core.sendToBackground('getCookies', [{ url: 'http://pan.baidu.com/', name: 'BDCLND' }], (value) => { this.cookies = decodeURIComponent(value['BDCLND']) })
+    Core.sendToBackground('getCookies', [{ url: 'http://pan.baidu.com/', name: 'BDCLND' }], (value) => { this.cookies = decodeURIComponent(value.BDCLND) })
   }
+
   startListen () {
     window.addEventListener('message', (event) => {
       if (event.source !== window) {
@@ -101,6 +102,7 @@ class Share extends Downloader {
       window.postMessage({ type: 'getSelected' }, location.origin)
     }
   }
+
   showCaptcha (data, resolve, auth) {
     const captcha = `
       <div id="captchaMenu" class="modal captcha-menu open-o">
@@ -136,7 +138,7 @@ class Share extends Downloader {
     })
     const apply = captchaMenu.querySelector('#apply')
     apply.addEventListener('click', () => {
-      data['vcode_input'] = document.querySelector('#vcodeValue').value
+      data.vcode_input = document.querySelector('#vcodeValue').value
       this.getFiles(this.files, data).then(() => {
         resolve()
       })
@@ -151,18 +153,19 @@ class Share extends Downloader {
       captchaMenu.querySelector('#vcode').src = `//pan.baidu.com/genimage?${data.vcode_str}&${new Date().getTime()}`
     })
   }
+
   getCaptcha (resolve, auth) {
     const search = {
       prod: 'share',
       bdstoken: window.yunData.MYBDSTOKEN,
-      app_id: 250528,
+      app_id: Core.getConfigData('appId'),
       channel: 'chunlei',
       clienttype: 0,
       web: 1
     }
     const parameter = {
       search,
-      url: `/api/getcaptcha?`,
+      url: '/api/getcaptcha?',
       options: {
         credentials: 'include',
         method: 'GET'
@@ -186,19 +189,29 @@ class Share extends Downloader {
       console.log(err)
     })
   }
+
   getPrefixLength () {
     const path = Core.getHashParameter('list/path') || Core.getHashParameter('path') || ''
+    const parentPath = Core.getHashParameter('parentPath')
+    const rootPath = decodeURIComponent(window.yunData.FILEINFO[window.yunData.FILEINFO.length - 1].parent_path)
     // solution for example :链接:http://pan.baidu.com/s/1hqOIdUk 密码:qat2
-    if (path !== window.yunData.PATH) {
-      return window.yunData.PATH.slice(0, window.yunData.PATH.lastIndexOf('/')).length + 1
+
+    // 针对单文件夹的下载 保留所有路径
+    if (window.yunData.FILEINFO.length === 1) {
+      return 1
+    } else if (parentPath) {
+      return rootPath.length + path.slice(parentPath.length).length + 1
+    } else if (path !== rootPath) {
+      return rootPath.length + path.length
     } else {
       return path.length === 1 ? 1 : path.length + 1
     }
   }
+
   getFiles (files, captcha) {
     this.files = files
-    let list = []
-    for (let key in files) {
+    const list = []
+    for (const key in files) {
       list.push(files[key].fs_id)
     }
     const body = {
@@ -210,24 +223,24 @@ class Share extends Downloader {
     }
 
     if (!window.yunData.SHARE_PUBLIC) {
-      body['extra'] = JSON.stringify({ sekey: this.cookies })
+      body.extra = JSON.stringify({ sekey: this.cookies })
     }
     if (captcha) {
-      body['vcode_input'] = captcha['vcode_input']
-      body['vcode_str'] = captcha['vcode_str']
+      body.vcode_input = captcha.vcode_input
+      body.vcode_str = captcha.vcode_str
     }
     const search = {
       timestamp: window.yunData.TIMESTAMP,
       sign: window.yunData.SIGN,
       bdstoken: window.yunData.MYBDSTOKEN,
-      app_id: 250528,
+      app_id: Core.getConfigData('appId'),
       channel: 'chunlei',
       clienttype: 0,
       web: 1
     }
     const parameter = {
       search,
-      url: `/api/sharedownload?`,
+      url: '/api/sharedownload?',
       options: {
         body: Core.objectToQueryString(body),
         credentials: 'include',
@@ -243,13 +256,21 @@ class Share extends Downloader {
         if (response.ok) {
           response.json().then((data) => {
             if (data.errno === 0) {
-              data.list.forEach((item) => {
+              if (window.yunData.SHAREPAGETYPE === 'single_file_page') {
                 this.fileDownloadInfo.push({
-                  name: item.path.substr(prefix),
-                  link: item.dlink,
-                  md5: item.md5
+                  name: data.list[0].server_filename,
+                  link: data.list[0].dlink,
+                  md5: data.list[0].md5
                 })
-              })
+              } else {
+                data.list.forEach((item) => {
+                  this.fileDownloadInfo.push({
+                    name: item.path.substr(prefix),
+                    link: item.dlink,
+                    md5: item.md5
+                  })
+                })
+              }
               resolve()
             } else if (data.errno === -20) {
               Core.showToast('请输入验证码以继续下载', 'caution')
@@ -258,6 +279,8 @@ class Share extends Downloader {
               } else {
                 this.getCaptcha(resolve, false)
               }
+            } else {
+              Core.showToast('出现未知错误，下载失败', 'failure')
             }
           })
         } else {
