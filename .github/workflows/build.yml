@@ -28,5 +28,7 @@ jobs:
         run : |
           git config --global user.email "tofuliang@gmail.com"
           git config --global user.name "tofuliang"
+          git add BaiduExporter.crx chrome/updates.xml
+          git checkout *
           git commit -m "update crx"
           git push
