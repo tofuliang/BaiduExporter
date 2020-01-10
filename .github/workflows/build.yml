@@ -1,6 +1,6 @@
 name: Node CI
 
-on: 
+on:
   watch:
     types: [started]
 
@@ -20,10 +20,12 @@ jobs:
           PRIVATE_KEY: ${{ secrets.buildPem }}
         run: |
           cd chrome
-          npm install yarn
+          npm install yarn crx
           yarn
-          npm run pack
+          npm run build
           cd ..
+          cat <<< $PRIVATE_KEY > ../build.pem
+          npx crx pack chrome/release -p ../build.pem -o BaiduExporter.crx
       - name: Set git identity
         run : |
           git config --global user.email "tofuliang@gmail.com"

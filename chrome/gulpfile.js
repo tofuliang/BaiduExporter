@@ -27,8 +27,6 @@ const uglify = require('gulp-uglify')
 
 const fs = require('fs')
 const replace = require('gulp-replace');
-const crx = require('gulp-crx-pack');
-const manifest = require('./manifest.json');
 
 const paths = {
   scripts: {
@@ -183,22 +181,9 @@ function bumpVersion() {
       ;
 }
 
-function pack() {
-  return gulp.src('./release')
-      .pipe(crx({
-        privateKey: process.env.PRIVATE_KEY,
-        filename: '../BaiduExporter.crx',
-        codebase: 'https://raw.githubusercontent.com/'+manifest.author+'/BaiduExporter/master/BaiduExporter.crx',
-        updateXmlFilename: 'updates.xml'
-      }))
-      .pipe(gulp.dest(function(file) {
-          return file.base;
-      }));
-}
 const build = gulp.parallel(scripts, styles, images, copys)
 const serve = gulp.series(clean, build, watch)
 const publish = gulp.series(clean, build)
-const packCrx = gulp.series(publish,pack)
 
 exports.build = build
 exports.serve = serve
@@ -207,4 +192,3 @@ exports.lintJS = lintJS
 exports.lintCSS = lintCSS
 exports.clean = clean
 exports.bumpVersion = bumpVersion
-exports.pack = packCrx
