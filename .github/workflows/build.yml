@@ -1,0 +1,28 @@
+name: Node CI
+
+on: 
+  watch:
+    types: [started]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install, build, and test
+        env:
+          PRIVATE_KEY: ${{ secrets.buildPem }}
+        run: |
+          cd chrome
+          npm install yarn
+          yarn
+          npm run pack
+          cd ..
+          git commit -m "update crx"
+          git push
