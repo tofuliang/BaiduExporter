@@ -24,5 +24,9 @@ jobs:
           yarn
           npm run pack
           cd ..
+      - name: Set git identity
+        run : |
+          git config --global user.email "tofuliang@gmail.com"
+          git config --global user.name "tofuliang"
           git commit -m "update crx"
           git push
