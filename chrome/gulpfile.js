@@ -27,8 +27,8 @@ const uglify = require('gulp-uglify')
 
 const fs = require('fs')
 const replace = require('gulp-replace');
-const manifest = require('./extension-src/manifest.json');
 const crx = require('gulp-crx-pack');
+const manifest = require('./manifest.json');
 
 const paths = {
   scripts: {
