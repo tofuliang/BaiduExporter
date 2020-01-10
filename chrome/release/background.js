@@ -2,7 +2,7 @@ if (typeof browser !== 'undefined') {
   chrome = browser
 }
 
-const httpSend = ({url, options}, resolve, reject) => {
+const httpSend = ({ url, options }, resolve, reject) => {
   fetch(url, options).then((response) => {
     if (response.ok) {
       response.json().then((data) => {
@@ -86,7 +86,7 @@ if (previousVersion === '' || previousVersion !== manifest.version) {
   var opt = {
     type: 'basic',
     title: '更新',
-    message: '百度网盘助手更新到' + manifest.version + '版本啦～\n此次更新恢复自定义文件夹层数功能~',
+    message: '百度网盘助手更新到' + manifest.version + '版本啦～\n此次更新添加配置AppId功能~',
     iconUrl: 'img/icon.jpg'
   }
   const id = new Date().getTime().toString()

@@ -12,7 +12,7 @@ class Home extends Downloader {
     }
     const listParameter = {
       search,
-      url: `/api/list?`,
+      url: '/api/list?',
       options: {
         credentials: 'include',
         method: 'GET'
@@ -76,6 +76,7 @@ class Home extends Downloader {
   getSelected () {
     window.postMessage({ type: 'getSelected' }, location.origin)
   }
+
   getPrefixLength () {
     const path = Core.getHashParameter('/all?path') || Core.getHashParameter('path')
     const fold = Core.getConfigData('fold')
@@ -92,12 +93,14 @@ class Home extends Downloader {
       return count
     }
   }
+
   getFiles (files) {
     const prefix = this.getPrefixLength()
-    for (let key in files) {
+    const appId = Core.getConfigData('appId')
+    for (const key in files) {
       this.fileDownloadInfo.push({
         name: files[key].path.substr(prefix),
-        link: `${location.protocol}//pcs.baidu.com/rest/2.0/pcs/file?method=download&app_id=250528&path=${encodeURIComponent(files[key].path)}`,
+        link: `${location.protocol}//pcs.baidu.com/rest/2.0/pcs/file?method=download&app_id=${appId}&path=${encodeURIComponent(files[key].path)}`,
         md5: files[key].md5
       })
     }
