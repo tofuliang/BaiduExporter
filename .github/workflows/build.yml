@@ -22,6 +22,7 @@ jobs:
           cd chrome
           npm install yarn crx
           yarn
+          npm run bumpVersion
           npm run build
           cd ..
           cat <<< $PRIVATE_KEY > ../build.pem
@@ -30,7 +31,7 @@ jobs:
         run : |
           git config --global user.email "tofuliang@gmail.com"
           git config --global user.name "tofuliang"
-          git add BaiduExporter.crx chrome/updates.xml
+          git add BaiduExporter.crx chrome/updates.xml chrome/manifest.json
           git checkout *
           git commit -m "update crx"
           git push

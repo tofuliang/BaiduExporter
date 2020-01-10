@@ -32,19 +32,19 @@ const paths = {
   scripts: {
     src: 'src/js/**/*.js',
     entry: 'src/js/*.js',
-    dest: 'dist/js/'
+    dest: 'release/js/'
   },
   styles: {
     src: 'src/css/**/*.scss',
-    dest: 'dist/css/'
+    dest: 'release/css/'
   },
   images: {
     src: 'src/img/**/*',
-    dest: 'dist/img/'
+    dest: 'release/img/'
   },
   copys: {
     src: ['_locales/**/*', 'background.js', 'manifest.json'],
-    dest: 'dist/'
+    dest: 'release/'
   }
 }
 
@@ -140,7 +140,7 @@ function copys () {
 }
 
 function clean () {
-  return del(['dist'])
+  return del(['release'])
 }
 
 function watch () {
