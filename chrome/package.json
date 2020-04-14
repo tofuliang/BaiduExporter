@@ -1,0 +1,68 @@
+{
+  "name": "baiduexporter",
+  "version": "1.0.4",
+  "description": "Assistant for Baidu to export download links to aria2/aria2-rpc",
+  "main": "background.js",
+  "scripts": {
+    "start": "npm run dev",
+    "serve": "npm run dev",
+    "dev": "NODE_ENV=development gulp serve",
+    "build": "NODE_ENV=production gulp publish",
+    "clean": "gulp clean",
+    "lint:js": "gulp lintJS",
+    "lint:css": "gulp lintCSS",
+    "test": "npm run lint:js && npm run lint:css",
+    "eslint:fix": "eslint --fix src",
+    "stylelint:fix": "stylefmt -r \"src/**/*.scss\" && stylelint \"src/**/*.scss\" -s scss",
+    "lint:fix": "npm run stylelint:fix && npm run eslint:fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acgotaku/BaiduExporter.git"
+  },
+  "keywords": [
+    "BaiduExporter",
+    "aria2"
+  ],
+  "author": "acgotaku311",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/acgotaku/BaiduExporter/issues"
+  },
+  "homepage": "https://github.com/acgotaku/BaiduExporter#readme",
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.0",
+    "@rollup/plugin-commonjs": "^11.0.1",
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "autoprefixer": "^9.7.1",
+    "del": "^5.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^6.0.0",
+    "gulp-if": "^3.0.0",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rollup-each": "^3.0.1",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-stylelint": "^13.0.0",
+    "gulp-terser": "^1.2.0",
+    "gulp-uglify": "^3.0.2",
+    "imagemin-mozjpeg": "^8.0.0",
+    "imagemin-pngquant": "^8.0.0",
+    "rollup": "^2.1.0",
+    "stylefmt": "^6.0.3",
+    "stylelint": "^13.2.1",
+    "stylelint-config-sass-guidelines": "^7.0.0",
+    "stylelint-order": "^4.0.0",
+    "stylelint-scss": "^3.12.1"
+  }
+}
